@@ -1,0 +1,46 @@
+
+name: Build SONORA APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Extraer proyecto SONORA
+        run: |
+          unzip -o SonoraMusic_redisenada_completa.zip -d proyecto
+          find proyecto -name gradlew -type f
+
+      - name: Compilar APK
+        run: |
+          GRADLEW=$(find proyecto -name gradlew -type f | head -n 1)
+          test -n "$GRADLEW"
+          chmod +x "$GRADLEW"
+          cd "$(dirname "$GRADLEW")"
+          ./gradlew assembleDebug --stacktrace
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SONORA-APK
+          path: proyecto/**/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          
