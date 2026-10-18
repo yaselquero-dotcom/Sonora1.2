@@ -1,3 +1,4 @@
+
 name: Build SONORA APK
 
 on:
@@ -30,15 +31,19 @@ jobs:
 
       - name: Preparar Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: |
+            platforms;android-35
+            build-tools;35.0.0
+
+      - name: Aceptar licencias Android
+        run: yes | sdkmanager --licenses
 
       - name: Extraer proyecto SONORA
         run: |
           unzip -o SonoraMusic_redisenada_completa.zip -d proyecto
           test -f proyecto/SonoraMusic/settings.gradle
           test -f proyecto/SonoraMusic/app/build.gradle
-
-      - name: Instalar Android SDK requerido
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Compilar APK de prueba
         run: |
